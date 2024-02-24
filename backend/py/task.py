@@ -13,22 +13,46 @@ class File:
 Task 1
 """
 def leafFiles(files: list[File]) -> list[str]:
-    return []
+    leafFiles = set()
+    id_to_name = {}
+    for file in files:
+        leafFiles.add(file.id)
+        id_to_name[file.id] = file.name
+    for file in files:
+        leafFiles.discard(file.parent)
+    return [id_to_name[file] for file in leafFiles]
 
 
 """
 Task 2
 """
 def kLargestCategories(files: list[File], k: int) -> list[str]:
-    return []
+    categories = {}
+    for file in files:
+        for category in file.categories:
+            categories[category] = categories.get(category, 0) + 1
+    categories_sorted = sorted(categories, key=lambda x: x)
+    return sorted(categories_sorted, key=lambda x: categories[x], reverse=True)[:k]
 
 
 """
 Task 3
 """
 def largestFileSize(files: list[File]) -> int:
-    return 0
+    if files == []:
+        return 0
+    parentFiles = {file.id: file.size for file in files if file.parent == -1}
+    allFiles = {file.id: file for file in files}
+    for fileContent in allFiles.values():
+        addToParent(fileContent, parentFiles, allFiles)
+    return max(parentFiles.values())
 
+def addToParent(fileContent, parentFiles, otherFiles):
+    current = fileContent.parent
+    while current != -1:
+        if current in parentFiles:
+            parentFiles[current] += fileContent.size
+        current = otherFiles[current].parent
 
 if __name__ == '__main__':
     testFiles = [
